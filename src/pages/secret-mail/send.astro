@@ -1,0 +1,21 @@
+---
+import LetterLayout from '../../layouts/LetterLayout.astro';
+import MailSend from '../../components/secret-mail/MailSend';
+import SecureMailLayout from '../../layouts/SecureMailLayout.astro';
+
+const pageTitle = 'Create a Secret Letter';
+const pageDescription =
+  'Create a letter with multiple encrypted paragraphs, each with its own seal.';
+---
+
+<SecureMailLayout>
+  <main class='flex-1 flex flex-col items-center justify-start w-full p-4 py-12 sm:p-12 sm:pl-32'>
+    <div class='text-center w-full max-w-5xl mx-auto mb-6'>
+      <h1 class='text-3xl font-bold text-stone-900 tracking-wider'>{pageTitle}</h1>
+      <p class='text-sm text-stone-400 mt-1'>{pageDescription}</p>
+    </div>
+    <LetterLayout>
+      <MailSend client:load />
+    </LetterLayout>
+  </main>
+</SecureMailLayout>

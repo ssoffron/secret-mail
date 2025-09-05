@@ -1,0 +1,40 @@
+---
+import { cn } from '@/lib/utils';
+import MailSendIcon from '../assets/icons/MailSend.astro';
+import MailboxIcon from '../assets/icons/Mailbox.astro';
+import Layout from './Layout.astro';
+import { Button } from '@/components/ui/button';
+
+const baseClass =
+  'flex items-center font-medium w-12 tracking-wide py-3 px-4 rounded-r-lg shadow-md transform transition-all duration-200 ease-in-out hover:translate-x-1 focus:outline-none focus:ring-2 focus:ring-offset-amber-50 focus:ring-red-600';
+const activeClass = cn(baseClass, 'bg-red-600 text-amber-50 translate-x-0 z-10');
+const inactiveClass = cn(
+  baseClass,
+  'bg-amber-200 text-stone-700 -translate-x-1 hover:bg-amber-200/80',
+);
+---
+
+<Layout>
+  <div class='flex min-h-screen bg-amber-50 text-stone-700'>
+    <nav class='fixed top-1/2 -translate-y-1/2 left-0 flex flex-col space-y-2 z-30'>
+      <Button
+        className={Astro.url.pathname.includes('/send') ? activeClass : inactiveClass}
+        variant='outline'
+      >
+        <a href='send'>
+          <MailSendIcon />
+        </a>
+      </Button>
+      <Button
+        className={Astro.url.pathname.includes('/receive') ? activeClass : inactiveClass}
+        variant='outline'
+      >
+        <a href='receive'>
+          <MailboxIcon />
+        </a>
+      </Button>
+    </nav>
+
+    <slot />
+  </div>
+</Layout>

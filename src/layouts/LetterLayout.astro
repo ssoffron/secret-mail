@@ -1,0 +1,30 @@
+---
+import SunflowerCorner from '../components/secret-mail/SunflowerCorner.astro';
+
+export interface Props {
+  className?: string;
+}
+
+const { className = '' } = Astro.props;
+---
+
+<div
+  class={`w-full max-w-3xl mx-auto bg-amber-50 rounded-md shadow-lg relative pt-16 pb-8 px-4 sm:px-12 ${className}`}
+>
+  <div
+    class='absolute top-0 left-0 -translate-x-4 -translate-y-4 sm:-translate-x-8 sm:-translate-y-8 text-amber-200/70 w-32 h-32 sm:w-48 sm:h-48'
+    aria-hidden='true'
+  >
+    <SunflowerCorner />
+  </div>
+  <div
+    class='absolute bottom-0 right-0 translate-x-4 translate-y-4 sm:translate-x-8 sm:translate-y-8 text-amber-200/70 w-32 h-32 sm:w-48 sm:h-48 -scale-x-100 -scale-y-100'
+    aria-hidden='true'
+  >
+    <SunflowerCorner />
+  </div>
+
+  <div class='relative z-10 space-y-6'>
+    <slot />
+  </div>
+</div>
