@@ -6,12 +6,9 @@ import Layout from './Layout.astro';
 import { Button } from '@/components/ui/button';
 
 const baseClass =
-  'flex items-center font-medium w-12 tracking-wide py-3 px-4 rounded-r-lg shadow-md transform transition-all duration-200 ease-in-out hover:translate-x-1 focus:outline-none focus:ring-2 focus:ring-offset-amber-50 focus:ring-red-600';
-const activeClass = cn(baseClass, 'bg-red-600 text-amber-50 translate-x-0 z-10');
-const inactiveClass = cn(
-  baseClass,
-  'bg-amber-200 text-stone-700 -translate-x-1 hover:bg-amber-200/80',
-);
+  'flex items-center font-medium w-12 tracking-wide p-0 rounded-r-lg shadow-md transform transition-all duration-200 ease-in-out -translate-x-1 focus:outline-none focus:ring-2 focus:ring-offset-amber-50 focus:ring-red-600';
+const activeClass = cn(baseClass, 'z-10 bg-red-600 text-amber-50 hover:bg-red-600/50');
+const inactiveClass = cn(baseClass, 'bg-amber-200 text-stone-700 hover:bg-amber-200/50');
 ---
 
 <Layout>
@@ -21,7 +18,7 @@ const inactiveClass = cn(
         className={Astro.url.pathname.includes('/send') ? activeClass : inactiveClass}
         variant='outline'
       >
-        <a href='send'>
+        <a href='send' class='inline-flex items-center justify-center w-full h-full'>
           <MailSendIcon />
         </a>
       </Button>
@@ -29,7 +26,7 @@ const inactiveClass = cn(
         className={Astro.url.pathname.includes('/receive') ? activeClass : inactiveClass}
         variant='outline'
       >
-        <a href='receive'>
+        <a href='receive' class='inline-flex items-center justify-center w-full h-full'>
           <MailboxIcon />
         </a>
       </Button>

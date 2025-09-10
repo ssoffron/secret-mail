@@ -1,71 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Input from './Input';
 import { Button } from '@/components/ui/button';
 import BrokenWaxSeal from '@/assets/icons/BrokenWaxSeal';
-
-// --- Start of Web Crypto API Helpers ---
-const PWD_ITERATIONS = 100000;
-
-// Converts a Base64 string to an ArrayBuffer
-function base64ToBuffer(base64: string): ArrayBuffer {
-  const binary_string = window.atob(base64);
-  const len = binary_string.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binary_string.charCodeAt(i);
-  }
-  return bytes.buffer;
-}
-
-// Derives a key from a password and salt using PBKDF2
-async function getKey(password: string, salt: Uint8Array): Promise<CryptoKey> {
-  const enc = new TextEncoder();
-  const keyMaterial = await window.crypto.subtle.importKey(
-    'raw',
-    enc.encode(password),
-    { name: 'PBKDF2' },
-    false,
-    ['deriveKey'],
-  );
-  return window.crypto.subtle.deriveKey(
-    {
-      name: 'PBKDF2',
-      salt: salt,
-      iterations: PWD_ITERATIONS,
-      hash: 'SHA-256',
-    },
-    keyMaterial,
-    { name: 'AES-GCM', length: 256 },
-    true,
-    ['encrypt', 'decrypt'],
-  );
-}
-
-// Decrypts a message using the derived key
-async function decryptMessage(
-  ciphertext: ArrayBuffer,
-  key: CryptoKey,
-  iv: Uint8Array,
-): Promise<string> {
-  const decrypted = await window.crypto.subtle.decrypt(
-    {
-      name: 'AES-GCM',
-      iv: iv,
-    },
-    key,
-    ciphertext,
-  );
-  const dec = new TextDecoder();
-  return dec.decode(decrypted);
-}
-// --- End of Web Crypto API Helpers ---
-
-interface EncryptedParagraph {
-  hint: string;
-  salt: string; // Base64
-  iv: string; // Base64
-  data: string; // Base64
-}
+import {
+  base64ToBuffer,
+  getKey,
+  decryptMessage,
+  decodeDataFromURL,
+  type EncryptedParagraph,
+  type EncryptedLetter,
+} from '@/lib/crypto';
 
 interface DecryptionState extends EncryptedParagraph {
   id: string;
@@ -82,43 +26,43 @@ const linedPaperStyle = {
 };
 
 const MailReceive: React.FC = () => {
-  const [pastedInput, setPastedInput] = useState<string>('');
+  const [letterTitle, setLetterTitle] = useState<string>('');
   const [decryptionItems, setDecryptionItems] = useState<DecryptionState[]>([]);
   const [error, setError] = useState<string>('');
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
-  const handleLoadForDecryption = () => {
-    setError('');
-    setDecryptionItems([]);
-    if (!pastedInput.trim()) {
-      setError('Please paste the encrypted data.');
+  // Load and decode data from URL parameter (client-side only)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const dataParam = urlParams.get('d');
+
+    if (!dataParam) {
+      setIsLoaded(false);
       return;
     }
-    try {
-      const parsedData = JSON.parse(pastedInput);
-      if (
-        !Array.isArray(parsedData) ||
-        !parsedData.every(
-          (item) => 'hint' in item && 'data' in item && 'salt' in item && 'iv' in item,
-        )
-      ) {
-        throw new Error(
-          'Invalid data structure. Make sure it was created with the current version of the app.',
-        );
-      }
-      const items: DecryptionState[] = parsedData.map((item: EncryptedParagraph) => ({
-        ...item,
-        id: crypto.randomUUID(),
-        passwordInput: '',
-        decryptedMessage: '',
-        error: '',
-        isDecrypted: false,
-      }));
-      setDecryptionItems(items);
-    } catch (e) {
-      setError('Invalid or corrupt encrypted data. Please check the format.');
-      console.error(e);
+
+    const decoded = decodeDataFromURL(dataParam);
+    if (!decoded) {
+      setError('Invalid or corrupted data in URL. Please check the link.');
+      setIsLoaded(false);
+      return;
     }
-  };
+
+    const items: DecryptionState[] = decoded.paragraphs.map((item: EncryptedParagraph) => ({
+      ...item,
+      id: crypto.randomUUID(),
+      passwordInput: '',
+      decryptedMessage: '',
+      error: '',
+      isDecrypted: false,
+    }));
+
+    setLetterTitle(decoded.title);
+    setDecryptionItems(items);
+    setIsLoaded(true);
+  }, []);
 
   const handleDecryptionPasswordChange = (id: string, value: string) => {
     setDecryptionItems((prev) =>
@@ -138,12 +82,12 @@ const MailReceive: React.FC = () => {
     }
 
     try {
-      const salt = base64ToBuffer(itemToDecrypt.salt);
-      const iv = base64ToBuffer(itemToDecrypt.iv);
-      const ciphertext = base64ToBuffer(itemToDecrypt.data);
+      const salt = new Uint8Array(base64ToBuffer(itemToDecrypt.salt));
+      const iv = new Uint8Array(base64ToBuffer(itemToDecrypt.iv));
+      const ciphertext = base64ToBuffer(itemToDecrypt.ciphertext);
 
-      const key = await getKey(itemToDecrypt.passwordInput, salt as Uint8Array);
-      const decryptedText = await decryptMessage(ciphertext, key, iv as Uint8Array);
+      const key = await getKey(itemToDecrypt.passwordInput, salt);
+      const decryptedText = await decryptMessage(ciphertext, key, iv);
 
       setDecryptionItems((prev) =>
         prev.map((item) =>
@@ -172,26 +116,26 @@ const MailReceive: React.FC = () => {
 
   return (
     <div className='space-y-4'>
-      <div className='space-y-4'>
-        <Input
-          id='pastedData'
-          label='Encrypted Letter Data'
-          isTextArea
-          value={pastedInput}
-          onChange={(e) => setPastedInput(e.target.value)}
-          placeholder='Paste the JSON data here...'
-        />
-        <Button onClick={handleLoadForDecryption} className='w-full'>
-          <BrokenWaxSeal />
-          Load Letter to Unseal
-        </Button>
-      </div>
+      {!isLoaded ? (
+        <div className='bg-amber-50 border border-amber-200 rounded-lg p-8 text-center'>
+          <p className='text-stone-700 text-base mb-2'>No encrypted letter found in URL</p>
+          <p className='text-stone-500 text-sm'>
+            Please use a link generated from the Send page to view an encrypted letter.
+          </p>
+        </div>
+      ) : (
+        <div className='bg-amber-50 border border-amber-200 rounded-lg p-4 text-center'>
+          <p className='text-stone-700 text-sm'>
+            Letter loaded from link. Enter the password(s) below to reveal the message.
+          </p>
+        </div>
+      )}
 
       {error && <p className='text-red-700 text-sm text-center'>{error}</p>}
 
       {decryptionItems.length > 0 && (
         <div className='mt-6 space-y-4'>
-          <h3 className='text-xl font-semibold text-stone-900 text-center'>Your Letter</h3>
+          <h3 className='text-xl font-semibold text-stone-900 text-center'>{letterTitle}</h3>
           {decryptionItems.map((item, index) => (
             <div key={item.id} className='pt-4 border-t border-dashed border-amber-200'>
               {item.hint && <p className='text-sm text-stone-400 italic mb-2'>Hint: {item.hint}</p>}
