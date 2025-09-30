@@ -3,5 +3,11 @@ import Layout from '@/layouts/Layout.astro';
 ---
 
 <Layout>
-  Redirecting to <a href='/secret-mail/send'>Secret Mail</a>...
+  <div style="text-align: center; padding: 2rem;">
+    <p>Redirecting to <a href='./secret-mail/send'>Secret Mail</a>...</p>
+  </div>
 </Layout>
+
+<script>
+  window.location.href = './secret-mail/send';
+</script>
