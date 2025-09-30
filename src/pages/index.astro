@@ -1,13 +1,15 @@
 ---
 import Layout from '@/layouts/Layout.astro';
+
+const redirectTo = './send';
 ---
 
 <Layout>
-  <div style="text-align: center; padding: 2rem;">
-    <p>Redirecting to <a href='./secret-mail/send'>Secret Mail</a>...</p>
+  <div style='text-align: center; padding: 2rem;'>
+    <p>Redirecting to <a href={redirectTo}>Secret Mail</a>...</p>
   </div>
 </Layout>
 
-<script>
-  window.location.href = './secret-mail/send';
+<script define:vars={{ redirectTo }}>
+  window.location.href = redirectTo;
 </script>

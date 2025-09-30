@@ -18,7 +18,7 @@ const inactiveClass = cn(baseClass, 'bg-amber-200 text-stone-700 hover:bg-amber-
         className={Astro.url.pathname.includes('/send') ? activeClass : inactiveClass}
         variant='outline'
       >
-        <a href='send' class='inline-flex items-center justify-center w-full h-full'>
+        <a href='./send' class='inline-flex items-center justify-center w-full h-full'>
           <MailSendIcon />
         </a>
       </Button>
@@ -26,7 +26,7 @@ const inactiveClass = cn(baseClass, 'bg-amber-200 text-stone-700 hover:bg-amber-
         className={Astro.url.pathname.includes('/receive') ? activeClass : inactiveClass}
         variant='outline'
       >
-        <a href='receive' class='inline-flex items-center justify-center w-full h-full'>
+        <a href='./receive' class='inline-flex items-center justify-center w-full h-full'>
           <MailboxIcon />
         </a>
       </Button>
