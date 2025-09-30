@@ -7,6 +7,9 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://ssoffron.github.io',
+  base: '/secret-mail',
+
   integrations: [react()],
 
   vite: {
