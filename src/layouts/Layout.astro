@@ -1,15 +1,41 @@
 ---
 import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Secret Mail - Secure Message Encryption',
+  description = 'Send encrypted messages that are secured directly in your browser. Nothing is stored on servers - only those with the password can read your message.',
+} = Astro.props;
 ---
 
 <!doctype html>
 <html lang='en'>
   <head>
     <meta charset='UTF-8' />
-    <meta name='viewport' content='width=device-width' />
-    <link rel='icon' type='image/svg+xml' href='/favicon.svg' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <meta name='description' content={description} />
     <meta name='generator' content={Astro.generator} />
-    <title>Astro Basics</title>
+
+    <!-- Open Graph / Facebook -->
+    <meta property='og:type' content='website' />
+    <meta property='og:title' content={title} />
+    <meta property='og:description' content={description} />
+
+    <!-- Twitter -->
+    <meta property='twitter:card' content='summary' />
+    <meta property='twitter:title' content={title} />
+    <meta property='twitter:description' content={description} />
+
+    <link rel='icon' type='image/svg+xml' href='/secret-mail/favicon.svg' />
+    <link rel='shortcut icon' href='/secret-mail/favicon.ico' />
+    <link rel='apple-touch-icon' sizes='180x180' href='/secret-mail/apple-touch-icon.png' />
+    <link rel='manifest' href='/secret-mail/site.webmanifest' />
+
+    <title>{title}</title>
   </head>
   <body>
     <slot />

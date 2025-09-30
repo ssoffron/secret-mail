@@ -4,6 +4,7 @@ import MailSendIcon from '../assets/icons/MailSend.astro';
 import MailboxIcon from '../assets/icons/Mailbox.astro';
 import Layout from './Layout.astro';
 import { Button } from '@/components/ui/button';
+import { SEND_URL, RECEIVE_URL } from '@/lib/constants';
 
 const baseClass =
   'flex items-center font-medium w-12 tracking-wide p-0 rounded-r-lg shadow-md transform transition-all duration-200 ease-in-out -translate-x-1 focus:outline-none focus:ring-2 focus:ring-offset-amber-50 focus:ring-red-600';
@@ -18,7 +19,7 @@ const inactiveClass = cn(baseClass, 'bg-amber-200 text-stone-700 hover:bg-amber-
         className={Astro.url.pathname.includes('/send') ? activeClass : inactiveClass}
         variant='outline'
       >
-        <a href='send' class='inline-flex items-center justify-center w-full h-full'>
+        <a href={SEND_URL} class='inline-flex items-center justify-center w-full h-full'>
           <MailSendIcon />
         </a>
       </Button>
@@ -26,7 +27,7 @@ const inactiveClass = cn(baseClass, 'bg-amber-200 text-stone-700 hover:bg-amber-
         className={Astro.url.pathname.includes('/receive') ? activeClass : inactiveClass}
         variant='outline'
       >
-        <a href='receive' class='inline-flex items-center justify-center w-full h-full'>
+        <a href={RECEIVE_URL} class='inline-flex items-center justify-center w-full h-full'>
           <MailboxIcon />
         </a>
       </Button>

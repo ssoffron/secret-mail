@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Check, Eraser, Plus } from 'lucide-react';
 import WaxSeal from '@/assets/icons/WaxSeal';
 import { encryptParagraphs, encodeDataForURL, type Paragraph } from '@/lib/crypto';
+import { RECEIVE_URL } from '@/lib/constants';
 
 const linedPaperStyle = {
   lineHeight: '2.1em',
@@ -54,8 +55,7 @@ const MailSend: React.FC = () => {
 
       // Generate shareable URL
       const compressed = encodeDataForURL(encryptedLetter);
-      const baseUrl = window.location.origin;
-      const url = `${baseUrl}/secret-mail/receive?d=${compressed}`;
+      const url = `${window.location.origin}${RECEIVE_URL}?d=${compressed}`;
 
       // Copy to clipboard immediately
       await navigator.clipboard.writeText(url);
