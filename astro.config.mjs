@@ -17,6 +17,6 @@ export default defineConfig({
   },
 
   redirects: {
-    '/': '/secret-mail/send',
+    '/': '/send',
   },
 });
